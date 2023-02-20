@@ -226,27 +226,47 @@ const regadoComponent = () => {
   }
 
   const onSelectChangeMaterial = (e, name) => {
-    console.log(e)
-    let materiales = fumigacion.all_materiales
-    materiales.push({
-      cantidad_material: 0,
-      fumigacion_materiales_id: e.id ,
-      fumigacion_materiales_name: e.name,
-      id_fmc: ""
+    let fumMaterial = fumigacion.all_materiales
+    if(fumigacion.all_materiales !== null) {
+      if(!fumigacion.all_materiales.find(el => el.fumigacion_materiales_id === e.id)) {
+        fumMaterial.push({
+          cantidad_material: 0,
+          fumigacion_materiales_id: e.id,
+          fumigacion_materiales_name: e.name,
+          id_fmc: 2
+        })
+      }
+    }else {
+      fumMaterial.push({
+        cantidad_material: 0,
+        fumigacion_materiales_id: e.id,
+        fumigacion_materiales_name: e.name,
+        id_fmc: 2
+      })
+    }
+
+    setfumigacion({
+      ...fumigacion,
+      all_materiales: fumMaterial
     })
 
+  }
+
+  const changeCantidadMaterial = (e, id_material) => {
+    const val = (e.target && e.target.value) || '';
+    console.log(val)
+    const materiales = fumigacion.all_materiales
+    for (let i = 0; i < materiales.length; i++) {
+      if(materiales[i].fumigacion_materiales_id === id_material){
+        materiales[i].cantidad_material = val
+      }
+    }
+    
     setfumigacion({
       ...fumigacion,
       all_materiales: materiales
     })
   }
-
-  const sizeEditor = (options) => {
-    return inputTextEditor(options);
-  };
-  const inputTextEditor = (options) => {
-    return <InputText type="text" value={options.rowData[options.field]} width="2rem" />;
-  };
 
   return (
     <div className="grid">
@@ -324,17 +344,20 @@ const regadoComponent = () => {
         </div>
         <div className="flex flex-column md:flex-row gap-3 mb-3">
           <div className="field flex-1">
-            {
-              fumigacion.all_materiales !== null ?
-                <DataTable value={fumigacion.all_materiales} size="small">
-                  <Column header="Orden"></Column>
-                  <Column field="fumigacion_materiales_name" header="Material"></Column>
-                  <Column field="cantidad_material" editor={sizeEditor} header="Cantidad" style={{ height: '3.5rem' , width : '3.5rem' }} headerStyle={{ minWidth: '6rem' }}></Column>
-                </DataTable>
-              :
-              <span>No hay materiales seleccionados</span>
-            }
-          </div>
+              <div className="card flex flex-wrap gap-2">
+                {
+                  fumigacion.all_materiales !== null ?
+                    fumigacion.all_materiales.map((el, i) => {
+                      return <div key={i} className='card'>
+                              <span>{el.fumigacion_materiales_name}</span>
+                              <InputText id='cantidad_material' value={el.cantidad_material} onChange={(e) => changeCantidadMaterial(e, el.fumigacion_materiales_id) }></InputText>
+                            </div>
+                    })
+                  :
+                  <span>No hay materiales seleccionados</span>
+                }
+              </div>
+            </div>
         </div>
       </Dialog>
     </div>
