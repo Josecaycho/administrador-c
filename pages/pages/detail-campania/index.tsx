@@ -77,6 +77,9 @@ const regadoComponent = () => {
                 <span className="block text-500 font-medium mb-3">Fumigacion</span>
                 <div className="text-900 font-medium text-xl">{`S/ ` + controlCampania.costo_campania_fumigacion }</div>
             </div>
+            <div className="flex align-items-center justify-content-center border-round">
+                <Button onClick={(e) => verDetalle('fumigacion')}>Ver detalles</Button>
+            </div>
           </div>
           <span className="text-green-500 font-medium">Cantidad:  { controlCampania.cantidad_campania_fumigacion } Fumigacion </span>
           {/* <span className="text-500">since last visit</span> */}
@@ -88,6 +91,9 @@ const regadoComponent = () => {
             <div>
                 <span className="block text-500 font-medium mb-3">regado</span>
                 <div className="text-900 font-medium text-xl">{`S/ ` + controlCampania.costo_campania_regado }</div>
+            </div>
+            <div className="flex align-items-center justify-content-center border-round">
+                <Button onClick={(e) => verDetalle('regado')}>Ver detalles</Button>
             </div>
           </div>
           <span className="text-green-500 font-medium">Cantidad:  { controlCampania.cantidad_campania_regado } regado </span>

@@ -28,8 +28,8 @@ const Crud = () => {
         id: null,
         name: '',
         anio: { name : dateNow.getFullYear()},
-        fecha_inicio: dateNow,
-        fecha_fin: dateNow
+        fecha_inicio: null,
+        fecha_fin: null
     };
 
     const [products, setProducts] = useState(null);

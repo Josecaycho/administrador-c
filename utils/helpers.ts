@@ -9,9 +9,10 @@ const getActuallyDate = (date: any) => {
   return datestring;
 };
 
+
 const getFormatStringDate = (date: any) => {
   let firstDate = date.split('/')
-  let dateFinal = new Date(firstDate[2] , firstDate[1] ,firstDate[0])
+  let dateFinal = new Date(firstDate[2] , parseInt(firstDate[1]) - 1 ,firstDate[0])
   
   return dateFinal
 }
