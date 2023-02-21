@@ -91,4 +91,34 @@ export default {
     );
     return response.json()
   },
+
+  async editfumigacion(payload) {
+    const response = await fetch(API_GATEWAY.URL + '/campanias/fumigacion/'+ payload.id ,
+      {
+          method: 'put',
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": "token-value",
+          },
+          body: JSON.stringify(payload),
+      }
+    );
+    return response.json()
+  },
+
+  async nuevofumigacion(payload) {
+    const response = await fetch(API_GATEWAY.URL + '/campanias/fumigacion',
+    {
+      method: 'post',
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": "token-value",
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+  return response.json()
+  },
+
+
 }

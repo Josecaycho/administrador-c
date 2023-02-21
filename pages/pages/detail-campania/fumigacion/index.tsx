@@ -15,7 +15,7 @@ import helpers from '../../../../utils/helpers';
 import { Toast } from 'primereact/toast';
 import { json } from 'stream/consumers';
 import { Chip } from 'primereact/chip';
-
+import { MoreLinkRoot } from '@fullcalendar/core';
 
 
 const regadoComponent = () => {
@@ -28,10 +28,12 @@ const regadoComponent = () => {
     trabajadores: 0,
     jornales: 0,
     costo: 0,
-    all_materiales: null,
+    all_materiales: [],
     tipo_fumigacion: null,
     forma_fumigacion: null
   };
+
+  const tiposDosis = ["ML","KG","LT"]
 
   const [modalfumigacion, setModalfumigacion] = useState(false)
   const [fumigacions, setfumigacions] = useState([]);
@@ -46,7 +48,7 @@ const regadoComponent = () => {
   const [materialesView, setMaterialesView] = useState([])
 
   useEffect(() => {
-    let costoTotal: any = fumigacion.costo * fumigacion.jornales * fumigacion.trabajadores
+    let costoTotal: any = fumigacion.costo * fumigacion.jornales
     setCostoTotalfumigacion(costoTotal)
   }, [
     fumigacion.costo,
@@ -136,7 +138,15 @@ const regadoComponent = () => {
     let fumigacionSend = {
       ...fumigacion,
       fecha_fumigacion: fumigacion.fecha_fumigacion !== '00/00/0000' ? helpers.getFormatStringDate(fumigacion.fecha_fumigacion) : null,
-      all_materiales: JSON.parse(fumigacion.all_materiales)
+      all_materiales: JSON.parse(fumigacion.all_materiales),
+      tipo_fumigacion: {
+        id: fumigacion.fumigacion_tipo_id,
+        name: fumigacion.fumigacion_tipo_name
+      },
+      forma_fumigacion: {
+        id: fumigacion.fumigacion_forma_id,
+        name: fumigacion.fumigacion_forma_name
+      }
     }
     console.log(fumigacionSend)
     setfumigacion(fumigacionSend)
@@ -156,7 +166,7 @@ const regadoComponent = () => {
     return (
       <>
         <span className="p-column-title">Name</span>
-        {(rowData.trabajadores * rowData.jornales * rowData.costo).toFixed(2)}
+        {(rowData.jornales * rowData.costo).toFixed(2)}
       </>
     );
   };
@@ -190,10 +200,10 @@ const regadoComponent = () => {
       let json = {
         ...fumigacion,
         fecha_fumigacion: helpers.getActuallyDate(fumigacion.fecha_fumigacion),
-        campania_id: localStorage.getItem('campaniaSelected')
+        campania_id: localStorage.getItem('campaniaSelected'),
+        fumigacion_forma_id: fumigacion.forma_fumigacion.id,
+        fumigacion_tipo_id: fumigacion.tipo_fumigacion.id
       }
-
-      console.log(json)
 
       CampaniaService.editfumigacion(json)
       .then((res) => {
@@ -201,10 +211,12 @@ const regadoComponent = () => {
         allData()
       })
     } else {
-      let json = {
+      let json = {  
         ...fumigacion,
         fecha_fumigacion: helpers.getActuallyDate(fumigacion.fecha_fumigacion),
-        campania_id: localStorage.getItem('campaniaSelected')
+        campania_id: localStorage.getItem('campaniaSelected'),
+        fumigacion_forma_id: fumigacion.forma_fumigacion.id,
+        fumigacion_tipo_id: fumigacion.tipo_fumigacion.id
       }
 
       CampaniaService.nuevofumigacion(json)
@@ -233,7 +245,8 @@ const regadoComponent = () => {
           cantidad_material: 0,
           fumigacion_materiales_id: e.id,
           fumigacion_materiales_name: e.name,
-          id_fmc: 2
+          id: null,
+          campania_fumigacion_id: fumigacion.id
         })
       }
     }else {
@@ -241,7 +254,8 @@ const regadoComponent = () => {
         cantidad_material: 0,
         fumigacion_materiales_id: e.id,
         fumigacion_materiales_name: e.name,
-        id_fmc: 2
+        id: null,
+        campania_fumigacion_id: fumigacion.id
       })
     }
 
@@ -254,11 +268,25 @@ const regadoComponent = () => {
 
   const changeCantidadMaterial = (e, id_material) => {
     const val = (e.target && e.target.value) || '';
-    console.log(val)
     const materiales = fumigacion.all_materiales
     for (let i = 0; i < materiales.length; i++) {
       if(materiales[i].fumigacion_materiales_id === id_material){
         materiales[i].cantidad_material = val
+      }
+    }
+    
+    setfumigacion({
+      ...fumigacion,
+      all_materiales: materiales
+    })
+  }
+
+  const changeDosisMaterila = (e, id_material) => {
+    console.log(e)
+    const materiales = fumigacion.all_materiales
+    for (let i = 0; i < materiales.length; i++) {
+      if(materiales[i].fumigacion_materiales_id === id_material){
+        materiales[i].dosis = e
       }
     }
     
@@ -321,11 +349,11 @@ const regadoComponent = () => {
             <InputText id="trabajadores" placeholder='0' value={fumigacion.trabajadores} onChange={(e) => onInputChange(e, 'trabajadores')} disabled={disabled} />
           </div>
           <div className='field flex-1'>
-            <label>Jornales</label>
+            <label>Cilindros</label>
             <InputText id="jornales" placeholder='0' value={fumigacion.jornales} onChange={(e) => onInputChange(e, 'jornales')} disabled={disabled} />
           </div>
           <div className='field flex-1'>
-            <label>Costo mano de obra</label>
+            <label>Costo por cilindro</label>
             <InputText id="costo" placeholder='0' value={fumigacion.costo} onChange={(e) => onInputChange(e, 'costo')} disabled={disabled}/>
           </div>
           <div className='field flex-1'>
@@ -344,14 +372,29 @@ const regadoComponent = () => {
         </div>
         <div className="flex flex-column md:flex-row gap-3 mb-3">
           <div className="field flex-1">
-              <div className="card flex flex-wrap gap-2">
+              <div className="card gap-2">
                 {
                   fumigacion.all_materiales !== null ?
                     fumigacion.all_materiales.map((el, i) => {
-                      return <div key={i} className='card'>
-                              <span>{el.fumigacion_materiales_name}</span>
-                              <InputText id='cantidad_material' value={el.cantidad_material} onChange={(e) => changeCantidadMaterial(e, el.fumigacion_materiales_id) }></InputText>
-                            </div>
+                      return  <div key={i} className='card content-material'>
+                                <div className='content-material-info'>
+                                  <div className='content-material-info_name'>
+                                    <span>{el.fumigacion_materiales_name}</span>
+                                  </div>
+                                  <div className='flex align-items-center gap-1'>
+                                  <InputText id='cantidad_material' value={el.cantidad_material} disabled={disabled } onChange={(e) => changeCantidadMaterial(e, el.fumigacion_materiales_id) }></InputText>
+                                    <Dropdown value={el.dosis} onChange={(e) => changeDosisMaterila(e.value, el.fumigacion_materiales_id)} id="dosis"  options={tiposDosis} disabled={disabled}/>
+                                    <span className='color-black'> /cil </span>
+                                  </div>
+                                  {
+                                    !disabled ?
+                                    <div className='content-material-info_buttons'>
+                                      <Button icon="pi pi-trash" className="p-button-rounded p-button-warning mr-2"/>
+                                    </div>
+                                    :''
+                                  }
+                                </div>
+                              </div>
                     })
                   :
                   <span>No hay materiales seleccionados</span>

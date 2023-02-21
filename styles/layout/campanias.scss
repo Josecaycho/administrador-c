@@ -4,3 +4,30 @@
     align-items: center;
     margin-bottom: 1rem;
 }
+
+
+.content-material{
+    margin-bottom: 15px !important;
+    padding: 1rem 2rem;
+    &-info{
+        display: flex;
+        gap: 2rem;
+        justify-content: space-between;
+        align-items: center;
+
+        &_name{
+            width: 100px;
+        }
+
+        input{
+            width: 60px !important;
+        }
+
+        &_buttons{
+            display: flex;
+            gap: 2px;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+}
