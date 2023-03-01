@@ -16,6 +16,11 @@ export default {
     return response.json()
   },
 
+  async getDetailCampaniasCampaniaAbonado(payload) {
+    const response = await fetch(API_GATEWAY.URL + '/campanias/detalle/campania/abonado/'+payload);
+    return response.json()
+  },
+
   async getTypes(payload) {
     const response = await fetch(API_GATEWAY.URL + '/campanias/typesP');
     return response.json()
@@ -33,6 +38,11 @@ export default {
 
   async materialesFumigacion(payload) {
     const response = await fetch(API_GATEWAY.URL + '/campanias/materialesFumigacion');
+    return response.json()
+  },
+
+  async materialesAbonado(payload) {
+    const response = await fetch(API_GATEWAY.URL + '/campanias/materialesAbonado');
     return response.json()
   },
 
@@ -108,16 +118,44 @@ export default {
 
   async nuevofumigacion(payload) {
     const response = await fetch(API_GATEWAY.URL + '/campanias/fumigacion',
-    {
-      method: 'post',
-      headers: {
-        "Content-Type": "application/json",
-        "x-access-token": "token-value",
-      },
-      body: JSON.stringify(payload),
-    }
-  );
-  return response.json()
+      {
+        method: 'post',
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": "token-value",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    return response.json()
+  },
+
+  async editabonado(payload) {
+    const response = await fetch(API_GATEWAY.URL + '/campanias/abonado/'+ payload.id ,
+      {
+          method: 'put',
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": "token-value",
+          },
+          body: JSON.stringify(payload),
+      }
+    );
+    return response.json()
+  },
+
+  async nuevoabonado(payload) {
+    const response = await fetch(API_GATEWAY.URL + '/campanias/abonado',
+      {
+        method: 'post',
+        headers: {
+          "Content-Type": "application/json",
+          "x-access-token": "token-value",
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    return response.json()
   },
 
 
